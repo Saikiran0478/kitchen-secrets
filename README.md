@@ -104,8 +104,7 @@ Deployed on Hugging Face Spaces:
     Data Scientist: M.Sai Kiran
 
 
----
 
-✅ **Now you can copy this entire block and paste it directly into `README.md` without any edits.**  
+📜 License
 
-👉 Do you want me to **also prepare the full Streamlit app code in one file** so you can paste it into `app.py` and run? Or should I create **REPORT.md** with roadmap and growth plan?
+This project is open-source and licensed under the MIT License.
