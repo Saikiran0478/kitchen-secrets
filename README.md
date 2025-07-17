@@ -75,11 +75,20 @@ pip install -r requirements.txt
 # 4. Run the app
 streamlit run app.py
 
-🌍 Deployment
+
+
+---
+
+## 🌍 Deployment
 
 Deployed on Hugging Face Spaces:
 👉 Click to Open App
-🎯 Future Enhancements
+
+
+
+---
+
+## 🎯 Future Enhancements
 
     AI-based Ingredient Parsing
 
@@ -91,7 +100,10 @@ Deployed on Hugging Face Spaces:
 
     AI-driven Recipe Summarization & Translation
 
-👨‍👩‍👧 Team
+
+---
+
+## 👨‍👩‍👧 Team
 
     Project Lead: Ch.Thanuja
 
@@ -103,8 +115,8 @@ Deployed on Hugging Face Spaces:
 
     Data Scientist: M.Sai Kiran
 
+---
 
-
-📜 License
+## 📜 License
 
 This project is open-source and licensed under the MIT License.
