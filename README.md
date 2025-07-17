@@ -52,34 +52,3 @@
     * Open-source Python libraries (e.g., spaCy for text parsing, basic rule-based parsing).
     * Client-side image/video compression libraries.
 * *Deployment:* Hugging Face Spaces
-
----
-
-## Getting Started
-
-### Prerequisites
-
-* Python 3.8+
-* pip (Python package installer)
-
-### Local Development Setup
-
-1.  *Clone the repository:*
-    bash
-    git clone [https://code.swecha.org/your-team-name/kitchen-secrets.git](https://code.swecha.org/your-team-name/kitchen-secrets.git)
-    cd kitchen-secrets
-    
-2.  *Create a virtual environment (recommended):*
-    bash
-    python -m venv venv
-    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
-    
-3.  *Install dependencies:*
-    bash
-    pip install -r requirements.txt
-    
-4.  *Run the Streamlit application:*
-    bash
-    streamlit run app.py
-    
-    The app will open in your default web browser (usually http://localhost:8501).
