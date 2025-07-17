@@ -1,7 +1,7 @@
 # Kitchen Secrets – Preserving Culinary Heritage
 
 ## 1. Team Information
-- **Team Name**: Innovault  
+- **Team Name**: **Innovault**  
 - **Team Members**:  
    **Ch. Thanuja** – Project Lead  
    **V. Rishi** – AI Engineer  
@@ -131,3 +131,10 @@ kitchen-secrets/
 ##  Acknowledgement
 
 This project is part of the **Viswam.ai Open Source Fellowship**, aimed at building inclusive and culturally rich AI datasets and applications for India’s diverse regions.
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
+
+
