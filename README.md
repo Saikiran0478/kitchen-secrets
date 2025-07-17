@@ -1,13 +1,13 @@
-# 🧑‍🍳 Kitchen Secrets – Preserving Culinary Heritage
+# Kitchen Secrets – Preserving Culinary Heritage
 
 ## 1. Team Information
 - **Team Name**: Innovault  
 - **Team Members**:  
-  👩‍💼 **Ch. Thanuja** – Project Lead  
-  🧠 **V. Rishi** – AI Engineer  
-  💻 **Nitin Sain** – Frontend Developer  
-  🎨 **Chandra Harsha** – UX Designer  
-  📊 **M. Sai Kiran** – Data Scientist  
+   **Ch. Thanuja** – Project Lead  
+   **V. Rishi** – AI Engineer  
+   **Nitin Sain** – Frontend Developer  
+   **Chandra Harsha** – UX Designer  
+   **M. Sai Kiran** – Data Scientist  
 
 ---
 
@@ -21,33 +21,33 @@ This project contributes to building a **diverse, multilingual recipe corpus** t
 
 ## 3. Key Features
 
-- 🔐 **Secure login system** – No anonymous users  
-- 🗺️ **Geo-coordinates** – Automatically capture or submit contributor location  
-- 👥 **User detail tracking** – Track submissions by authenticated user  
-- 🏷️ **Corpus categorization** – Festival, seasonal, snack/main/sweet, etc.  
-- 📝 **Title & description** – Contextual metadata for each recipe  
-- 🎥 **Media uploads** – Add images, videos, and audio  
-- 🌍 **Map visualization** – View recipe locations across India  
-- ❤️ **Reactions & comments** – Community interaction  
-- 🏆 **Leaderboard** – Sorted by contribution count  
+-  **Secure login system** – No anonymous users  
+-  **Geo-coordinates** – Automatically capture or submit contributor location  
+-  **User detail tracking** – Track submissions by authenticated user  
+-  **Corpus categorization** – Festival, seasonal, snack/main/sweet, etc.  
+-  **Title & description** – Contextual metadata for each recipe  
+-  **Media uploads** – Add images, videos, and audio  
+-  **Map visualization** – View recipe locations across India  
+-  **Reactions & comments** – Community interaction  
+-  **Leaderboard** – Sorted by contribution count  
 
 ---
 
 ## 4. Technical Architecture
 
-### 🔧 Frontend
+###  Frontend
 - Developed in **Streamlit**
 - Responsive layout with step-by-step form
 - Uses **Streamlit session state** for login and interaction
 - Includes dropdowns, map, media uploader, and live leaderboard
 
-### 📦 Backend
+###  Backend
 - User and recipe data stored in `users.json` and `recipes.json`
 - Media files saved locally (or base64-encoded)
 - Location fetched using IP-based lookup (`ipinfo.io`)
 - All data is structured for exportable corpus use
 
-### 🧠 AI Layer (Planned / Optional)
+###  AI Layer (Planned / Optional)
 - Use `langdetect` or FastText to detect recipe language
 - Normalize ingredients and instructions using IndicTrans2
 - Semantic search using SentenceTransformers
@@ -98,11 +98,11 @@ kitchen-secrets/
 
 ## 7. Corpus Impact
 
-- 🧾 300+ recipes submitted in 5 languages  
-- 📍 Location metadata collected from 18+ states  
-- 📚 Dishes include Pongal, Diwali sweets, Biryani variants, tribal dishes  
-- 🤝 Used in 3 regional food awareness events  
-- 🔊 Exploring regional speech corpus collection via recipes
+-  300+ recipes submitted in 5 languages  
+-  Location metadata collected from 18+ states  
+-  Dishes include Pongal, Diwali sweets, Biryani variants, tribal dishes  
+-  Used in 3 regional food awareness events  
+-  Exploring regional speech corpus collection via recipes
 
 ---
 
@@ -128,6 +128,6 @@ kitchen-secrets/
 
 ---
 
-## 🧠 Acknowledgement
+##  Acknowledgement
 
 This project is part of the **Viswam.ai Open Source Fellowship**, aimed at building inclusive and culturally rich AI datasets and applications for India’s diverse regions.
