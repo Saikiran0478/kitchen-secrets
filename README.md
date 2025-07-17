@@ -1,134 +1,111 @@
-# Kitchen Secrets – Unveiling India's Culinary Heritage (Rasoi Raaz)
+# 🍲 Kitchen Secrets (Rasoi Raaz)
+**Preserving India's Culinary Heritage Through Open-Source & AI**
 
 ---
 
-## Project Overview
-
-**Kitchen Secrets** (Rasoi Raaz) is a community-driven, open-source **Streamlit application** dedicated to preserving and celebrating India’s diverse family recipes. It allows users to share regional culinary knowledge via **text, images, audio, and video**, ensuring traditional recipes are archived and passed on for generations.
-
-It also acts as a **"Corpus Collection Engine"**, capturing rich, multimodal, multilingual culinary data from everyday Indian kitchens.
+## 🌟 Project Overview
+**Kitchen Secrets (Rasoi Raaz)** is a community-driven open-source application built using **Streamlit** that allows users to share, explore, and preserve traditional Indian recipes.  
+Our goal is to collect culturally rich culinary data in multiple formats (text, images, audio, video) to create an invaluable dataset for AI models while providing users an engaging and useful platform.
 
 ---
 
-## Team Information
-
-* **Project Lead:** Ch. Thanuja
-* **AI Engineer:** V. Rishi
-* **Frontend Developer:** Nitin Sain
-* **UX Designer:** Chandra Harsha
-* **Data Scientist:** M. Sai Kiran
-
----
-
-## Features (MVP)
-
-* **Multi-format Recipe Submission:** Submit recipes through:
-
-  * Text (typed or handwritten)
-  * Images (dishes, handwritten notes)
-  * Audio (narrations)
-  * Video (cooking walkthroughs)
-
-* **Geo Coordinates Capture:** Automatically or manually capture location (latitude, longitude) with each submission.
-
-* **User Details:** Collect contributor info — name, email (optional), and demographics (optional).
-
-* **Regional Categorization:** Tag recipes based on Indian states/regions.
-
-* **Corpus Category Selection:** Users must choose the type of corpus being contributed:
-
-  * Text
-  * Image-Text Pair
-  * Audio-Text Pair
-  * Video-Text Pair
-
-* **File + Description Input:** All uploads include both the media file and a description (ingredients, process, context).
-
-* **Interactive Browsing:** Filter by region, format, or popularity.
-
-* **Reactions & Comments:** Engage with likes, hearts, and comments.
-
-* **Point System:** Earn points for uploading and interacting.
-
-* **Offline-First Design:** Supports queuing uploads offline and syncing later.
-
-* **Optimized Media Uploads:** Client-side compression ensures uploads are bandwidth-friendly.
-
-* **Multilingual Interface:** UI is localized in major Indian languages.
-
-* **Basic AI Assistance:** Suggests regional tags and extracts ingredients/instructions from text.
-
-* **Data Collection:**
-  The app **collects and stores** all data submitted by users — including **text, images, audio, video, geo-coordinates, user info, and metadata** — for the purpose of creating a **searchable, multilingual, multimodal corpus of Indian recipes**.
+## 🛠 Features (MVP)
+- ✅ **Multi-format Recipe Submission:** Text + Images + Audio/Video
+- ✅ **Regional Categorization:** Filter recipes by Indian region
+- ✅ **Browse & Explore:** Interactive UI to view all contributions
+- ✅ **User Reactions & Comments:** Like, love, and comment on recipes
+- ✅ **Point System:** Earn points for uploads and interactions
+- ✅ **Offline-First Hint:** Handles low-connectivity gracefully
+- ✅ **Multilingual UI:** English, हिंदी, తెలుగు
 
 ---
 
-## Corpus Contribution
-
-Every submission enriches a growing **AI-ready corpus** that supports cultural preservation and future research. Each entry includes:
-
-* Media Content (Text, Images, Audio, Video)
-* Geo Coordinates (Latitude, Longitude)
-* User Details (Name, optional demographic info)
-* Corpus Category (Text, Image-Text, etc.)
-* Recipe Metadata (Region, language/dialect, format, file type)
-* Structured Description (Ingredients, steps, cultural context)
-
-This data enables:
-
-* **Cultural Archiving:** Preserving India’s culinary diversity.
-* **AI Training:** Supporting future multilingual, multimodal NLP and vision models.
-* **Cross-regional Insights:** Understanding food patterns, vocabularies, and regional identities.
+## 🧩 Why It Matters
+Each recipe submission contributes to a **Corpus Collection Engine**, capturing:
+- Regional food vocabulary in local languages
+- Step-by-step instructions
+- Image-text pairs (dish visuals)
+- Audio narrations (for future speech-to-text models)
 
 ---
 
-## Technical Stack
-
-* **Frontend:** Streamlit
-
-* **Backend & Storage:**
-
-  * Metadata: JSON files (scalable to SQLite)
-  * Media: Stored in Hugging Face Spaces filesystem (MVP)
-  * Offline Queue: Browser IndexedDB/LocalStorage
-
-* **AI/NLP:**
-
-  * Libraries: spaCy, custom rule-based parsers
-  * Media Compression: Client-side libraries (e.g., `browser-image-compression`, `ffmpeg`)
-
-* **Deployment:** Hugging Face Spaces
+## 🖼 Tech Stack
+- **Frontend:** Streamlit  
+- **Storage:** JSON (recipes, users) + Local media storage  
+- **Deployment:** Hugging Face Spaces  
+- **Languages Supported:** English, Hindi, Telugu  
 
 ---
 
-## Getting Started
+## 📂 Project Structure
+kitchen_secrets/
+├─ app.py                  # Main Streamlit app
+├─ data/
+│  ├─ recipes.json         # Stores all recipes
+│  ├─ users.json           # Tracks user points
+├─ media/
+│  ├─ images/              # Uploaded dish images
+│  ├─ audio/               # Uploaded audio files
+│  ├─ video/               # Uploaded videos
+├─ style.css               # Custom UI styling
+├─ requirements.txt
+└─ README.md
 
-### Prerequisites
-
-* Python 3.8+
-* pip (Python package installer)
-* streamlit
-* pyttsx3
 
 ---
 
-### Local Development Setup
+## ▶️ How to Run Locally
+### ✅ Prerequisites
+- Python 3.8+
+- pip (Python package manager)
 
+### ✅ Steps
 ```bash
-# Clone the repo
-git clone https://code.swecha.org/your-team-name/kitchen-secrets.git
+# 1. Clone the repo
+git clone https://code.swecha.org/your-team/kitchen-secrets.git
 cd kitchen-secrets
 
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+# 2. Create virtual environment
+python3 -m venv venv
+source venv/bin/activate    # (Windows: venv\Scripts\activate)
 
-# Install dependencies
+# 3. Install dependencies
 pip install -r requirements.txt
 
-# Run the app
+# 4. Run the app
 streamlit run app.py
-```
 
-The app will launch at: [http://localhost:8501](http://localhost:8501)
+🌍 Deployment
 
+Deployed on Hugging Face Spaces:
+👉 Click to Open App
+🎯 Future Enhancements
+
+    AI-based Ingredient Parsing
+
+    Automatic Regional Tag Suggestion
+
+    Community Challenges (Gamified Growth)
+
+    Offline Sync for low-connectivity support
+
+    AI-driven Recipe Summarization & Translation
+
+👨‍👩‍👧 Team
+
+    Project Lead: Ch.Thanuja
+
+    AI Engineer: V.Rishi
+
+    Frontend Developer: Nitin Sain
+
+    UX Designer: Chandra Harsha
+
+    Data Scientist: M.Sai Kiran
+
+
+---
+
+✅ **Now you can copy this entire block and paste it directly into `README.md` without any edits.**  
+
+👉 Do you want me to **also prepare the full Streamlit app code in one file** so you can paste it into `app.py` and run? Or should I create **REPORT.md** with roadmap and growth plan?
