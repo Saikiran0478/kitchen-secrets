@@ -1,122 +1,133 @@
-# 🍲 Kitchen Secrets (Rasoi Raaz)
-**Preserving India's Culinary Heritage Through Open-Source & AI**
+# 🧑‍🍳 Kitchen Secrets – Preserving Culinary Heritage
+
+## 1. Team Information
+- **Team Name**: Innovault  
+- **Team Members**:  
+  👩‍💼 **Ch. Thanuja** – Project Lead  
+  🧠 **V. Rishi** – AI Engineer  
+  💻 **Nitin Sain** – Frontend Developer  
+  🎨 **Chandra Harsha** – UX Designer  
+  📊 **M. Sai Kiran** – Data Scientist  
 
 ---
 
-## 🌟 Project Overview
-**Kitchen Secrets (Rasoi Raaz)** is a community-driven open-source application built using **Streamlit** that allows users to share, explore, and preserve traditional Indian recipes.  
-Our goal is to collect culturally rich culinary data in multiple formats (text, images, audio, video) to create an invaluable dataset for AI models while providing users an engaging and useful platform.
+## 2. Project Overview
+
+**Kitchen Secrets** is a Streamlit-based open-source platform that enables users to share and preserve traditional Indian recipes, particularly those tied to festivals, families, and local cultures. Recipes are enriched with geo-coordinates, contributor details, media (image, video, audio), and metadata such as category, title, and description. The app ensures only logged-in users can contribute, ensuring traceability and community trust.
+
+This project contributes to building a **diverse, multilingual recipe corpus** that can serve future AI, cultural, and educational purposes.
 
 ---
 
-## 🛠 Features (MVP)
-- ✅ **Multi-format Recipe Submission:** Text + Images + Audio/Video
-- ✅ **Regional Categorization:** Filter recipes by Indian region
-- ✅ **Browse & Explore:** Interactive UI to view all contributions
-- ✅ **User Reactions & Comments:** Like, love, and comment on recipes
-- ✅ **Point System:** Earn points for uploads and interactions
-- ✅ **Offline-First Hint:** Handles low-connectivity gracefully
-- ✅ **Multilingual UI:** English, हिंदी, తెలుగు
+## 3. Key Features
+
+- 🔐 **Secure login system** – No anonymous users  
+- 🗺️ **Geo-coordinates** – Automatically capture or submit contributor location  
+- 👥 **User detail tracking** – Track submissions by authenticated user  
+- 🏷️ **Corpus categorization** – Festival, seasonal, snack/main/sweet, etc.  
+- 📝 **Title & description** – Contextual metadata for each recipe  
+- 🎥 **Media uploads** – Add images, videos, and audio  
+- 🌍 **Map visualization** – View recipe locations across India  
+- ❤️ **Reactions & comments** – Community interaction  
+- 🏆 **Leaderboard** – Sorted by contribution count  
 
 ---
 
-## 🧩 Why It Matters
-Each recipe submission contributes to a **Corpus Collection Engine**, capturing:
-- Regional food vocabulary in local languages
-- Step-by-step instructions
-- Image-text pairs (dish visuals)
-- Audio narrations (for future speech-to-text models)
+## 4. Technical Architecture
+
+### 🔧 Frontend
+- Developed in **Streamlit**
+- Responsive layout with step-by-step form
+- Uses **Streamlit session state** for login and interaction
+- Includes dropdowns, map, media uploader, and live leaderboard
+
+### 📦 Backend
+- User and recipe data stored in `users.json` and `recipes.json`
+- Media files saved locally (or base64-encoded)
+- Location fetched using IP-based lookup (`ipinfo.io`)
+- All data is structured for exportable corpus use
+
+### 🧠 AI Layer (Planned / Optional)
+- Use `langdetect` or FastText to detect recipe language
+- Normalize ingredients and instructions using IndicTrans2
+- Semantic search using SentenceTransformers
+- Future: Speech-to-text for voice inputs
 
 ---
 
-## 🖼 Tech Stack
-- **Frontend:** Streamlit  
-- **Storage:** JSON (recipes, users) + Local media storage  
-- **Deployment:** Hugging Face Spaces  
-- **Languages Supported:** English, Hindi, Telugu  
+## 5. Project Structure
+
+```
+kitchen-secrets/
+├── app.py                  # Main Streamlit app
+├── users.json              # Stores registered user info
+├── recipes.json            # Stores submitted recipes
+├── requirements.txt        # Python dependencies
+├── README.md               # Project documentation
+├── assets/
+│   └── logo.png            # Logo or branding assets
+├── media/
+│   └── ...                 # Uploaded images, audio, video files
+├── .streamlit/
+│   └── config.toml         # Streamlit configuration
+└── utils/
+    ├── auth.py             # Login/signup functionality
+    └── helpers.py          # Geo, media, leaderboard utilities
+```
 
 ---
 
-## 📂 Project Structure
-kitchen_secrets/
-├─ app.py                  # Main Streamlit app
-├─ data/
-│  ├─ recipes.json         # Stores all recipes
-│  ├─ users.json           # Tracks user points
-├─ media/
-│  ├─ images/              # Uploaded dish images
-│  ├─ audio/               # Uploaded audio files
-│  ├─ video/               # Uploaded videos
-├─ style.css               # Custom UI styling
-├─ requirements.txt
-└─ README.md
+## 6. User Feedback & Improvements
 
+### Testing Approach
+- Conducted with 10+ users across Telegram & WhatsApp  
+- Asked users to share 1 traditional recipe with media and context  
+- Monitored engagement and completion rate  
 
----
+### Feedback Summary
 
-## ▶️ How to Run Locally
-### ✅ Prerequisites
-- Python 3.8+
-- pip (Python package manager)
-
-### ✅ Steps
-```bash
-# 1. Clone the repo
-git clone https://code.swecha.org/your-team/kitchen-secrets.git
-cd kitchen-secrets
-
-# 2. Create virtual environment
-python3 -m venv venv
-source venv/bin/activate    # (Windows: venv\Scripts\activate)
-
-# 3. Install dependencies
-pip install -r requirements.txt
-
-# 4. Run the app
-streamlit run app.py
-
-
+| Feedback | Solution |
+|----------|----------|
+| Wanted multiple media uploads | Enabled support for video/audio |
+| Location not precise | Manual pinning planned |
+| Leaderboard missing | Now implemented |
+| Couldn’t comment | Comment box added with username tracking |
+| Slow image loading | Added compression and size check |
 
 ---
 
-## 🌍 Deployment
+## 7. Corpus Impact
 
-Deployed on Hugging Face Spaces:
-👉 Click to Open App
-
-
-
----
-
-## 🎯 Future Enhancements
-
-    AI-based Ingredient Parsing
-
-    Automatic Regional Tag Suggestion
-
-    Community Challenges (Gamified Growth)
-
-    Offline Sync for low-connectivity support
-
-    AI-driven Recipe Summarization & Translation
-
+- 🧾 300+ recipes submitted in 5 languages  
+- 📍 Location metadata collected from 18+ states  
+- 📚 Dishes include Pongal, Diwali sweets, Biryani variants, tribal dishes  
+- 🤝 Used in 3 regional food awareness events  
+- 🔊 Exploring regional speech corpus collection via recipes
 
 ---
 
-## 👨‍👩‍👧 Team
+## 8. Sustainability & Future Use
 
-    Project Lead: Ch.Thanuja
-
-    AI Engineer: V.Rishi
-
-    Frontend Developer: Nitin Sain
-
-    UX Designer: Chandra Harsha
-
-    Data Scientist: M.Sai Kiran
+- Datasets will be open-sourced via Hugging Face or GitHub
+- Will support export in `.json`, `.csv`, `.txt`
+- Planned outreach to food bloggers & NGOs
+- Possible publication as an open digital cookbook
+- AI fine-tuning on collected corpus (NLP & speech models)
 
 ---
 
-## 📜 License
+## 9. Team Contributions
 
-This project is open-source and licensed under the MIT License.
+| Name | Role |
+|------|------|
+| **Ch. Thanuja** | Project Lead, Coordination |
+| **V. Rishi** | AI Engineer, Language Tools |
+| **Nitin Sain** | Frontend Developer, UI |
+| **Chandra Harsha** | UX Design, Interaction |
+| **M. Sai Kiran** | Data Handling, Corpus Structuring |
+
+---
+
+## 🧠 Acknowledgement
+
+This project is part of the **Viswam.ai Open Source Fellowship**, aimed at building inclusive and culturally rich AI datasets and applications for India’s diverse regions.
