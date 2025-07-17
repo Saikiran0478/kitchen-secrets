@@ -76,9 +76,9 @@ Every submission enriches a growing **AI-ready corpus** that supports cultural p
 
 This data enables:
 
-* **Cultural Archiving**: Preserving India’s culinary diversity.
-* **AI Training**: Supporting future multilingual, multimodal NLP and vision models.
-* **Cross-regional Insights**: Understanding food patterns, vocabularies, and regional identities.
+* **Cultural Archiving:** Preserving India’s culinary diversity.
+* **AI Training:** Supporting future multilingual, multimodal NLP and vision models.
+* **Cross-regional Insights:** Understanding food patterns, vocabularies, and regional identities.
 
 ---
 
@@ -107,6 +107,10 @@ This data enables:
 
 * Python 3.8+
 * pip (Python package installer)
+* streamlit
+* pyttsx3
+
+---
 
 ### Local Development Setup
 
@@ -127,5 +131,4 @@ streamlit run app.py
 ```
 
 The app will launch at: [http://localhost:8501](http://localhost:8501)
-
 
