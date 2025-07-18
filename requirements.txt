@@ -1,5 +1,13 @@
+
+
 streamlit
 Pillow
-geopy
+numpy
+pandas
 folium
 streamlit-folium
+geopy
+sentence-transformers
+fasttext
+wikipedia
+altair
