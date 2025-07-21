@@ -15,7 +15,6 @@ import fasttext
 import wikipedia
 import pandas as pd
 import altair as alt
-import urllib.request
 
 # --- Configuration and Initialization ---
 # Set page config - ensures wide layout for better content display
@@ -192,14 +191,7 @@ if not os.path.exists(MEDIA_DIR):
 @st.cache_resource
 def load_models():
     embedder = SentenceTransformer('paraphrase-MiniLM-L6-v2')
-
-    model_path = "lid.176.ftz"
-    if not os.path.exists(model_path):
-        with st.spinner("Downloading language detection model (~126 MB)..."):
-            url = "https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.ftz"
-            urllib.request.urlretrieve(url, model_path)
-
-    lang_model = fasttext.load_model(model_path)
+    lang_model = fasttext.load_model("lid.176.ftz")
     return embedder, lang_model
 
 embedder, lang_model = load_models()
@@ -220,13 +212,13 @@ def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
 def load_users():
-    if os.path.exists(users.json):
-        with open(users.json, 'r') as f:
+    if os.path.exists(USERS_FILE):
+        with open(USERS_FILE, 'r') as f:
             return json.load(f)
     return {}
 
 def save_users(users):
-    with open(users.json, 'w') as f:
+    with open(USERS_FILE, 'w') as f:
         json.dump(users, f, indent=4) # Added indent for readability
 
 def signup_user(username, password, name, email, location):
@@ -296,7 +288,7 @@ def detect_language(text):
         return "Unknown"
     try:
         pred = lang_model.predict(text.replace("\n", " "), k=1)
-        return pred[0][0].replace("_label_", "")
+        return pred[0][0].replace("__label__", "")
     except Exception:
         return "Error detecting language"
 
@@ -361,72 +353,59 @@ if not st.session_state.authenticated:
     st.markdown("<h3 style='text-align: center; color: #555;'>Unlock a World of Authentic Flavors and Festive Recipes.</h3>", unsafe_allow_html=True)
     st.divider()
 
-    # ✅ Session state initialization (place this before using session_state variables)
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
-if "username" not in st.session_state:
-    st.session_state.username = None
-if "user_data" not in st.session_state:
-    st.session_state.user_data = {}
-if "show_submit_form" not in st.session_state:
-    st.session_state.show_submit_form = False
-if "auth_choice_main" not in st.session_state:
-    st.session_state.auth_choice_main = "Login"
+    # Use a container to visually group login/signup forms
+    with st.container(border=False): # Changed to border=False as custom CSS handles border/shadow
+        col_login_spacer, col_login_form, col_login_spacer2 = st.columns([1, 2, 1])
+        with col_login_form:
+            auth_choice = st.radio(
+                "Choose an option to get started:",
+                ["Login", "Sign Up"],
+                key="auth_choice_main",
+                horizontal=True,
+                help="Select 'Login' if you have an account, or 'Sign Up' to create a new one."
+            )
+            st.markdown("<br>", unsafe_allow_html=True) # Add some space
 
-# Use a container to visually group login/signup forms
-with st.container(border=False):  # Custom CSS handles border/shadow
-    col_login_spacer, col_login_form, col_login_spacer2 = st.columns([1, 2, 1])
-    with col_login_form:
-        auth_choice = st.radio(
-            "Choose an option to get started:",
-            ["Login", "Sign Up"],
-            key="auth_choice_main",
-            horizontal=True,
-            help="Select 'Login' if you have an account, or 'Sign Up' to create a new one."
-        )
-        st.markdown("<br>", unsafe_allow_html=True)  # Add space
+            if auth_choice == "Login":
+                st.markdown("<h3>🔑 Login to Your Account</h3>", unsafe_allow_html=True)
+                with st.form("Login_Form", clear_on_submit=False):
+                    username_login = st.text_input("Username", key="username_login")
+                    password_login = st.text_input("Password", type="password", key="password_login")
+                    login_submit = st.form_submit_button("Login to Kitchen Secrets")
 
-        if auth_choice == "Login":
-            st.markdown("<h3>🔑 Login to Your Account</h3>", unsafe_allow_html=True)
-            with st.form("Login_Form", clear_on_submit=False):
-                username_login = st.text_input("Username", key="username_login")
-                password_login = st.text_input("Password", type="password", key="password_login")
-                login_submit = st.form_submit_button("Login to Kitchen Secrets")
-
-                if login_submit:
-                    if login_user(username_login, password_login):
-                        st.session_state.authenticated = True
-                        st.session_state.username = username_login
-                        users_data = load_users()
-                        st.session_state.user_data = users_data.get(username_login, {})
-                        st.success(f"🎉 Welcome back, {st.session_state.user_data.get('name', username_login)}! Redirecting...")
-                        st.rerun()
-                    else:
-                        st.error("❌ Invalid username or password. Please check your credentials.")
-
-        elif auth_choice == "Sign Up":
-            st.markdown("<h3>✨ Create a New Account</h3>", unsafe_allow_html=True)
-            with st.form("Signup_Form", clear_on_submit=True):
-                username_signup = st.text_input("Choose a Username", help="This will be your unique identifier.")
-                password_signup = st.text_input("Set a Password", type="password", help="Make it strong!")
-                name_signup = st.text_input("Your Full Name", help="How you'd like to be addressed in the community.")
-                email_signup = st.text_input("Your Email", help="For important notifications (we value your privacy).")
-                location_signup = st.text_input("Your Location (e.g., city, state)", help="Helps us understand regional food trends and connect you with local dishes.")
-                signup_submit = st.form_submit_button("Join Kitchen Secrets")
-
-                if signup_submit:
-                    if username_signup and password_signup and name_signup and email_signup and location_signup:
-                        if signup_user(username_signup, password_signup, name_signup, email_signup, location_signup):
-                            st.success("✅ Account created successfully! Please *Login* using your new credentials to continue.")
-                            # Set a safe flag to switch to login after rerun
-                            st.session_state.switch_to_login = True
+                    if login_submit:
+                        if login_user(username_login, password_login):
+                            st.session_state.authenticated = True
+                            st.session_state.username = username_login
+                            users_data = load_users()
+                            st.session_state.user_data = users_data.get(username_login, {})
+                            st.success(f"🎉 Welcome back, {st.session_state.user_data.get('name', username_login)}! Redirecting...")
                             st.rerun()
                         else:
-                            st.error("🚫 Username already exists. Please choose a different one.")
-                    else:
-                        st.warning("⚠ Please fill in all signup fields to create your account.")
+                            st.error("❌ Invalid username or password. Please check your credentials.")
+            elif auth_choice == "Sign Up":
+                st.markdown("<h3>✨ Create a New Account</h3>", unsafe_allow_html=True)
+                with st.form("Signup_Form", clear_on_submit=True):
+                    username_signup = st.text_input("Choose a Username", help="This will be your unique identifier.")
+                    password_signup = st.text_input("Set a Password", type="password", help="Make it strong!")
+                    name_signup = st.text_input("Your Full Name", help="How you'd like to be addressed in the community.")
+                    email_signup = st.text_input("Your Email", help="For important notifications (we value your privacy).")
+                    location_signup = st.text_input("Your Location (e.g., city, state)", help="Helps us understand regional food trends and connect you with local dishes.")
+                    signup_submit = st.form_submit_button("Join Kitchen Secrets")
 
-st.stop()  # Stop execution if not authenticated
+                    if signup_submit:
+                        if username_signup and password_signup and name_signup and email_signup and location_signup:
+                            if signup_user(username_signup, password_signup, name_signup, email_signup, location_signup):
+                                st.success("✅ Account created successfully! Please **Login** using your new credentials to continue.")
+                                # Optionally switch to login tab after successful signup
+                                st.session_state.auth_choice_main = "Login"
+                                st.rerun()
+                            else:
+                                st.error("🚫 Username already exists. Please choose a different one.")
+                        else:
+                            st.warning("⚠️ Please fill in all signup fields to create your account.")
+    st.stop() # Stop execution if not authenticated
+
 # --- Authenticated Section ---
 # Ensure user_data is always available right at the start of the authenticated section
 user_data = st.session_state.get("user_data", {}) 
@@ -436,7 +415,7 @@ if not user_data and st.session_state.username: # If authenticated but user_data
     st.session_state.user_data = user_data # Update session state
 
 st.markdown("<h1>Kitchen Secrets: Culinary Journey</h1>", unsafe_allow_html=True)
-st.markdown(f"<p style='text-align: center; color: #555;'>✨ Welcome, *{user_data.get('name', st.session_state.username)}*! Share your culinary traditions with the world. ✨</p>", unsafe_allow_html=True)
+st.markdown(f"<p style='text-align: center; color: #555;'>✨ Welcome, **{user_data.get('name', st.session_state.username)}**! Share your culinary traditions with the world. ✨</p>", unsafe_allow_html=True)
 st.divider() # Replaced st.markdown("---") for a cleaner line
 
 # --- Main Navigation / Action Buttons ---
@@ -456,7 +435,7 @@ if st.session_state.get('show_submit_form', False):
     st.info("💡 Fields marked with a * are required.")
     
     with st.form("submit_form", clear_on_submit=True):
-        st.markdown("<h3>Recipe Core Details 🍽</h3>", unsafe_allow_html=True)
+        st.markdown("<h3>Recipe Core Details 🍽️</h3>", unsafe_allow_html=True)
         col_r1, col_r2 = st.columns(2)
         with col_r1:
             title = st.text_input("Recipe Title *", placeholder="e.g., 'Hyderabadi Biryani', 'Misal Pav'", help="Give your delicious recipe a catchy, descriptive name.")
@@ -479,7 +458,7 @@ if st.session_state.get('show_submit_form', False):
                     if location:
                         latitude = location.latitude
                         longitude = location.longitude
-                        st.success(f"🗺 Coordinates found for {loc_input}: Lat {latitude:.4f}, Lon {longitude:.4f}")
+                        st.success(f"🗺️ Coordinates found for {loc_input}: Lat {latitude:.4f}, Lon {longitude:.4f}")
                     else:
                         st.warning(f"📍 Could not find precise coordinates for '{loc_input}'. Try a more general location (e.g., 'Mumbai') or leave this field blank.")
                 except Exception as e:
@@ -493,7 +472,7 @@ if st.session_state.get('show_submit_form', False):
         st.write("Enhance your recipe with a photo, cooking video, or even a narrated guide!")
         col_media1, col_media2, col_media3 = st.columns(3)
         with col_media1:
-            image_file = st.file_uploader("Upload an Image 🖼", type=["jpg", "jpeg", "png"], help="Show off your delicious creation! (Max 5MB recommended)")
+            image_file = st.file_uploader("Upload an Image 🖼️", type=["jpg", "jpeg", "png"], help="Show off your delicious creation! (Max 5MB recommended)")
         with col_media2:
             video_file = st.file_uploader("Upload a Video 📹", type=["mp4", "mov", "webm", "mpeg", "mpg"], help="A short clip of the cooking process or the final dish. (Max 20MB recommended)")
         with col_media3:
@@ -587,7 +566,7 @@ else:
     filtered_recipes.sort(key=lambda x: x.get('timestamp', '0'), reverse=True)
 
     for recipe in filtered_recipes:
-        with st.expander(f"🍽 *{recipe.get('title', 'Untitled Recipe')}* | by {recipe.get('name', recipe.get('username', 'Unknown'))} from {recipe.get('state_origin', 'Unknown State')}"):
+        with st.expander(f"🍽️ **{recipe.get('title', 'Untitled Recipe')}** | by {recipe.get('name', recipe.get('username', 'Unknown'))} from {recipe.get('state_origin', 'Unknown State')}"):
             
             # Use columns for media and details side-by-side
             col_display_media, col_display_details = st.columns([1, 2])
@@ -631,21 +610,21 @@ else:
             
             with col_display_details:
                 st.markdown("<h6>Recipe Overview 📝</h6>", unsafe_allow_html=True)
-                st.markdown(f"*Category:* {recipe.get('category', 'N/A')}")
-                st.markdown(f"*Origin:* {recipe.get('location_name', 'N/A')} ({recipe.get('state_origin', 'N/A')})")
-                st.markdown(f"*Submitted On:* {datetime.fromisoformat(recipe['timestamp']).strftime('%Y-%m-%d %H:%M')}")
+                st.markdown(f"**Category:** `{recipe.get('category', 'N/A')}`")
+                st.markdown(f"**Origin:** {recipe.get('location_name', 'N/A')} ({recipe.get('state_origin', 'N/A')})")
+                st.markdown(f"**Submitted On:** `{datetime.fromisoformat(recipe['timestamp']).strftime('%Y-%m-%d %H:%M')}`")
                 
                 st.markdown("---")
-                st.markdown("*Ingredients:*")
-                st.markdown(f"{recipe.get('ingredients', 'N/A')}")
+                st.markdown("**Ingredients:**")
+                st.markdown(f"_{recipe.get('ingredients', 'N/A')}_")
                 
-                st.markdown("*Instructions:*")
-                st.markdown(f"{recipe.get('steps', 'N/A')}")
+                st.markdown("**Instructions:**")
+                st.markdown(f"_{recipe.get('steps', 'N/A')}_")
                 
                 st.markdown("---")
                 st.markdown("<h6>AI Insights 🧠</h6>", unsafe_allow_html=True)
-                st.markdown(f"*Language Detected:* {recipe.get('language', 'N/A').upper()}")
-                st.markdown(f"*Wikipedia Summary:* {recipe.get('wiki_info', 'No specific Wikipedia information available for this dish.')}")
+                st.markdown(f"**Language Detected:** `{recipe.get('language', 'N/A').upper()}`")
+                st.markdown(f"**Wikipedia Summary:** _{recipe.get('wiki_info', 'No specific Wikipedia information available for this dish.')}_")
                 
                 # Similar Dishes
                 similar_dishes = get_similar_dishes(recipe.get('title', ''), all_recipes)
@@ -653,14 +632,14 @@ else:
                     st.markdown("---")
                     st.markdown("<h6>👨‍🍳 You might also like:</h6>", unsafe_allow_html=True)
                     for s_dish in similar_dishes:
-                        st.markdown(f"- *{s_dish.get('title', 'Unknown Dish')}* from {s_dish.get('state_origin', 'Unknown State')}")
+                        st.markdown(f"- **{s_dish.get('title', 'Unknown Dish')}** from {s_dish.get('state_origin', 'Unknown State')}")
                 else:
                     st.text("No similar recipes found in our collection yet.")
 
                 # Delete Button (only for owner)
                 if recipe.get('username') == st.session_state.username:
                     st.divider()
-                    if st.button(f"🗑 Delete This Recipe: {recipe.get('title', 'Untitled')}", key=f"delete_btn_{recipe['id']}", type="secondary", help="Permanently remove this recipe from the collection."):
+                    if st.button(f"🗑️ Delete This Recipe: {recipe.get('title', 'Untitled')}", key=f"delete_btn_{recipe['id']}", type="secondary", help="Permanently remove this recipe from the collection."):
                         if delete_submission(recipe['id']):
                             st.success("✅ Recipe deleted successfully!")
                             st.rerun()
@@ -669,7 +648,7 @@ else:
 st.divider() # Separator after explore recipes section
 
 # --- Map of Recipes ---
-st.markdown("<h2>🗺 Culinary Map of India</h2>", unsafe_allow_html=True)
+st.markdown("<h2>🗺️ Culinary Map of India</h2>", unsafe_allow_html=True)
 st.write("Visualize the geographical origins of our shared recipes across India.")
 
 map_data = pd.DataFrame([
@@ -695,7 +674,7 @@ if not map_data.empty:
     for idx, row in map_data.iterrows():
         folium.Marker(
             [row['latitude'], row['longitude']],
-            tooltip=f"{row['name']}** from {row['state']}"
+            tooltip=f"**{row['name']}** from {row['state']}"
         ).add_to(m)
     
     st_folium(m, width=700, height=500)
@@ -772,7 +751,7 @@ st.markdown("<p style='text-align: center; color: #808080; font-size: 0.8em;'>�
 
 # Logout in Sidebar (more professional placement)
 st.sidebar.markdown("---")
-st.sidebar.markdown(f"Logged in as: *{user_data.get('name', st.session_state.username)}*")
+st.sidebar.markdown(f"Logged in as: **{user_data.get('name', st.session_state.username)}**")
 if st.sidebar.button("🚪 Logout"):
     st.session_state.authenticated = False
     st.session_state.username = None
