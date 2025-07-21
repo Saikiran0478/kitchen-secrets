@@ -408,7 +408,7 @@ with st.container(border=False):  # Custom CSS handles border/shadow
                             st.success("✅ Account created successfully! Please **Login** using your new credentials to continue.")
                             # Set a safe flag to switch to login after rerun
                             st.session_state.switch_to_login = True
-                            st.rerun()
+                            st.experimental_rerun()
                         else:
                             st.error("🚫 Username already exists. Please choose a different one.")
                     else:
