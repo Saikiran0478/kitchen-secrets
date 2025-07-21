@@ -15,6 +15,7 @@ import fasttext
 import wikipedia
 import pandas as pd
 import altair as alt
+import urllib.request
 
 # --- Configuration and Initialization ---
 # Set page config - ensures wide layout for better content display
