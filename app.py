@@ -191,7 +191,14 @@ if not os.path.exists(MEDIA_DIR):
 @st.cache_resource
 def load_models():
     embedder = SentenceTransformer('paraphrase-MiniLM-L6-v2')
-    lang_model = fasttext.load_model("lid.176.ftz")
+
+    model_path = "lid.176.ftz"
+    if not os.path.exists(model_path):
+        with st.spinner("Downloading language detection model (~126 MB)..."):
+            url = "https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.ftz"
+            urllib.request.urlretrieve(url, model_path)
+
+    lang_model = fasttext.load_model(model_path)
     return embedder, lang_model
 
 embedder, lang_model = load_models()
