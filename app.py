@@ -433,14 +433,14 @@ with col_nav2:
 if st.session_state.get('show_submit_form', False):
     st.markdown("<h2>📝 Submit Your Recipe</h2>", unsafe_allow_html=True)
     st.info("💡 Fields marked with a * are required.")
-    
+
     with st.form("submit_form", clear_on_submit=True):
         st.markdown("<h3>Recipe Core Details 🍽️</h3>", unsafe_allow_html=True)
         col_r1, col_r2 = st.columns(2)
         with col_r1:
             title = st.text_input("Recipe Title *", placeholder="e.g., 'Hyderabadi Biryani', 'Misal Pav'", help="Give your delicious recipe a catchy, descriptive name.")
             category = st.selectbox("Category 📂", ["Festival", "Traditional", "Street Food", "Home Style", "Dessert", "Snack", "Beverage", "Other"], help="What kind of dish is this?")
-            
+
         with col_r2:
             state_selected = st.selectbox(
                 "State or Region of Origin 📍",
@@ -449,39 +449,26 @@ if st.session_state.get('show_submit_form', False):
                 help="Which Indian state/region is this dish typically from? This helps categorize and map the cuisine."
             )
             loc_input = st.text_input(
-    "Specific City/Town (Optional)",
-    value=user_data.get("location", ""),
-    placeholder="e.g., 'Hyderabad', 'Pune'",
-    help="Enter a specific city or town if you want to pinpoint this recipe's origin on the map."
-)
+                "Specific City/Town (Optional)",
+                value=user_data.get("location", ""),
+                placeholder="e.g., 'Hyderabad', 'Pune'",
+                help="Enter a specific city or town if you want to pinpoint this recipe's origin on the map."
+            )
 
-from geopy.geocoders import Nominatim
-from geopy.exc import GeocoderTimedOut
-import time
-
-def get_location_with_retry(place, retries=3, delay=2):
-    geolocator = Nominatim(user_agent="kitchen-secrets-app", timeout=10)
-    for attempt in range(retries):
-        try:
-            return geolocator.geocode(f"{place}, India")
-        except GeocoderTimedOut:
-            time.sleep(delay)
-    return None
-
-latitude, longitude = None, None
-if loc_input:
-    location = get_location_with_retry(loc_input)
-    if location:
-        latitude = location.latitude
-        longitude = location.longitude
-        st.success(f"🗺️ Coordinates found for {loc_input}: Lat {latitude:.4f}, Lon {longitude:.4f}")
-    else:
-        st.warning(f"📍 Could not find precise coordinates for '{loc_input}'. Try a more general location (e.g., 'Mumbai') or leave this field blank.")
+        latitude, longitude = None, None
+        if loc_input:
+            location = get_location_with_retry(loc_input)
+            if location:
+                latitude = location.latitude
+                longitude = location.longitude
+                st.success(f"🗺️ Coordinates found for {loc_input}: Lat {latitude:.4f}, Lon {longitude:.4f}")
+            else:
+                st.warning(f"📍 Could not find precise coordinates for '{loc_input}'. Try a more general location (e.g., 'Mumbai') or leave this field blank.")
 
         st.markdown("<h3>Ingredients & Preparation 🧑‍🍳</h3>", unsafe_allow_html=True)
         ingredients = st.text_area("Ingredients (comma-separated) *", height=100, placeholder="e.g., '2 cups basmati rice, 500g chicken, 1 onion, ginger-garlic paste'", help="List all ingredients clearly, separated by commas.")
         steps = st.text_area("Steps / Instructions *", height=250, placeholder="1. Wash rice and soak for 30 mins.\n2. Marinate chicken...\n3. Layer and cook...", help="Provide clear, step-by-step instructions for preparing the dish.")
-        
+
         st.markdown("<h3>Add Visuals & Audio 📸 (Optional)</h3>", unsafe_allow_html=True)
         st.write("Enhance your recipe with a photo, cooking video, or even a narrated guide!")
         col_media1, col_media2, col_media3 = st.columns(3)
@@ -491,69 +478,71 @@ if loc_input:
             video_file = st.file_uploader("Upload a Video 📹", type=["mp4", "mov", "webm", "mpeg", "mpg"], help="A short clip of the cooking process or the final dish. (Max 20MB recommended)")
         with col_media3:
             audio_file = st.file_uploader("Upload an Audio 🎤", type=["mp3", "wav", "ogg", "flac", "aac", "wma", "m4a", "aiff", "alac", "mpeg", "mp2"], help="Narrate the steps, share a traditional song, or capture cooking sounds. (Max 10MB recommended)")
-            
-        st.divider() # Cleaner separator before submit button
+
+        st.divider()
         submit = st.form_submit_button("🚀 Publish My Recipe!")
 
-        if submit:
-            if not title or not ingredients or not steps:
-                st.error("🚨 Title, Ingredients, and Steps are required fields. Please complete them before publishing.")
-            else:
-                image_path = None
-                if image_file:
-                    image_filename = f"{uuid.uuid4()}_{image_file.name}"
-                    image_path = os.path.join(MEDIA_DIR, image_filename)
-                    with open(image_path, "wb") as f:
-                        f.write(image_file.getbuffer())
-                    image_path = image_filename # Store relative path/filename
+    # Handle submission OUTSIDE the form
+    if submit:
+        if not title or not ingredients or not steps:
+            st.error("🚨 Title, Ingredients, and Steps are required fields. Please complete them before publishing.")
+        else:
+            image_path = None
+            if image_file:
+                image_filename = f"{uuid.uuid4()}_{image_file.name}"
+                image_path = os.path.join(MEDIA_DIR, image_filename)
+                with open(image_path, "wb") as f:
+                    f.write(image_file.getbuffer())
+                image_path = image_filename
 
-                video_path = None
-                if video_file:
-                    video_filename = f"{uuid.uuid4()}_{video_file.name}"
-                    video_path = os.path.join(MEDIA_DIR, video_filename)
-                    with open(video_path, "wb") as f:
-                        f.write(video_file.getbuffer())
-                    video_path = video_filename # Store relative path/filename
+            video_path = None
+            if video_file:
+                video_filename = f"{uuid.uuid4()}_{video_file.name}"
+                video_path = os.path.join(MEDIA_DIR, video_filename)
+                with open(video_path, "wb") as f:
+                    f.write(video_file.getbuffer())
+                video_path = video_filename
 
-                audio_path = None
-                if audio_file:
-                    audio_filename = f"{uuid.uuid4()}_{audio_file.name}"
-                    audio_path = os.path.join(MEDIA_DIR, audio_filename)
-                    with open(audio_path, "wb") as f:
-                        f.write(audio_file.getbuffer())
-                    audio_path = audio_filename # Store relative path/filename
-                
-                combined_text = f"{title} {ingredients} {steps}"
-                detected_language = detect_language(combined_text)
-                wiki_summary = get_wiki_summary(title)
+            audio_path = None
+            if audio_file:
+                audio_filename = f"{uuid.uuid4()}_{audio_file.name}"
+                audio_path = os.path.join(MEDIA_DIR, audio_filename)
+                with open(audio_path, "wb") as f:
+                    f.write(audio_file.getbuffer())
+                audio_path = audio_filename
 
-                data = {
-                    "username": st.session_state.username,
-                    "name": user_data.get("name", st.session_state.username),
-                    "email": user_data.get("email", "N/A"),
-                    "location_name": loc_input,
-                    "latitude": latitude,
-                    "longitude": longitude,
-                    "category": category,
-                    "state_origin": state_selected,
-                    "title": title,
-                    "ingredients": ingredients,
-                    "steps": steps,
-                    "language": detected_language,
-                    "image_path": image_path,
-                    "video_path": video_path,
-                    "audio_path": audio_path,
-                    "wiki_info": wiki_summary,
-                    "timestamp": datetime.now().isoformat()
-                }
-                
-                recipe_id = save_submission(data)
-                st.success(f"🎉 Success! Your recipe '{title}' has been submitted! (ID: {recipe_id})")
-                st.balloons() # Celebrate the submission!
-                st.session_state.show_submit_form = False # Hide form after submission
-                st.rerun() # Refresh to show new recipe in explore section
+            combined_text = f"{title} {ingredients} {steps}"
+            detected_language = detect_language(combined_text)
+            wiki_summary = get_wiki_summary(title)
 
-    st.divider() # Separator after submission form section
+            data = {
+                "username": st.session_state.username,
+                "name": user_data.get("name", st.session_state.username),
+                "email": user_data.get("email", "N/A"),
+                "location_name": loc_input,
+                "latitude": latitude,
+                "longitude": longitude,
+                "category": category,
+                "state_origin": state_selected,
+                "title": title,
+                "ingredients": ingredients,
+                "steps": steps,
+                "language": detected_language,
+                "image_path": image_path,
+                "video_path": video_path,
+                "audio_path": audio_path,
+                "wiki_info": wiki_summary,
+                "timestamp": datetime.now().isoformat()
+            }
+
+            recipe_id = save_submission(data)
+            st.success(f"🎉 Success! Your recipe '{title}' has been submitted! (ID: {recipe_id})")
+            st.balloons()
+            st.session_state.show_submit_form = False
+            st.rerun()
+
+    st.divider()
+
 
 # --- Explore Recipes Section ---
 st.markdown("<h2>📜 Explore Authentic Indian Recipes</h2>", unsafe_allow_html=True)
