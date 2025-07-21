@@ -434,35 +434,30 @@ if st.session_state.get('show_submit_form', False):
     st.markdown("<h2>📝 Submit Your Recipe</h2>", unsafe_allow_html=True)
     st.info("💡 Fields marked with a * are required.")
 
-    # Form begins
+    # Form block
     with st.form("submit_form", clear_on_submit=True):
         st.markdown("<h3>Recipe Core Details 🍽️</h3>", unsafe_allow_html=True)
         col_r1, col_r2 = st.columns(2)
-
         with col_r1:
-            title = st.text_input("Recipe Title *", placeholder="e.g., 'Hyderabadi Biryani', 'Misal Pav'", help="Give your delicious recipe a catchy, descriptive name.")
-            category = st.selectbox("Category 📂", ["Festival", "Traditional", "Street Food", "Home Style", "Dessert", "Snack", "Beverage", "Other"], help="What kind of dish is this?")
-        
+            title = st.text_input("Recipe Title *", placeholder="e.g., 'Hyderabadi Biryani', 'Misal Pav'")
+            category = st.selectbox("Category 📂", ["Festival", "Traditional", "Street Food", "Home Style", "Dessert", "Snack", "Beverage", "Other"])
+
         with col_r2:
             state_selected = st.selectbox(
                 "State or Region of Origin 📍",
                 INDIAN_STATES,
                 index=INDIAN_STATES.index(user_data.get("location", "Telangana")) if user_data.get("location") in INDIAN_STATES else 23,
-                help="Which Indian state/region is this dish typically from? This helps categorize and map the cuisine."
             )
             loc_input = st.text_input(
                 "Specific City/Town (Optional)",
                 value=user_data.get("location", ""),
-                placeholder="e.g., 'Hyderabad', 'Pune'",
-                help="Enter a specific city or town if you want to pinpoint this recipe's origin on the map."
+                placeholder="e.g., 'Hyderabad', 'Pune'"
             )
 
-        # Ingredients and Steps
         st.markdown("<h3>Ingredients & Preparation 🧑‍🍳</h3>", unsafe_allow_html=True)
-        ingredients = st.text_area("Ingredients (comma-separated) *", height=100, placeholder="e.g., '2 cups basmati rice, 500g chicken, 1 onion, ginger-garlic paste'", help="List all ingredients clearly, separated by commas.")
-        steps = st.text_area("Steps / Instructions *", height=250, placeholder="1. Wash rice and soak for 30 mins.\n2. Marinate chicken...\n3. Layer and cook...", help="Provide clear, step-by-step instructions for preparing the dish.")
+        ingredients = st.text_area("Ingredients (comma-separated) *", height=100)
+        steps = st.text_area("Steps / Instructions *", height=250)
 
-        # Media upload
         st.markdown("<h3>Add Visuals & Audio 📸 (Optional)</h3>", unsafe_allow_html=True)
         col_media1, col_media2, col_media3 = st.columns(3)
         with col_media1:
@@ -473,37 +468,40 @@ if st.session_state.get('show_submit_form', False):
             audio_file = st.file_uploader("Upload an Audio 🎤", type=["mp3", "wav", "ogg", "flac", "aac", "wma", "m4a", "aiff", "alac", "mpeg", "mp2"])
 
         st.divider()
-        submit = st.form_submit_button("🚀 Publish My Recipe")  # ✅ Correct location for the button
+        submit = st.form_submit_button("🚀 Publish My Recipe!")
 
-    # Form processing happens *after* the form block
+    # Handle form submission
     if submit:
-        # Handle geolocation outside form scope
-        latitude, longitude = None, None
-
-        def get_location_with_retry(place, retries=3, delay=2):
-            geolocator = Nominatim(user_agent="kitchen-secrets-app", timeout=10)
-            for attempt in range(retries):
-                try:
-                    return geolocator.geocode(f"{place}, India")
-                except GeocoderTimedOut:
-                    time.sleep(delay)
-            return None
-
-        if loc_input:
-            location = get_location_with_retry(loc_input)
-            if location:
-                latitude = location.latitude
-                longitude = location.longitude
-                st.success(f"🗺️ Coordinates found for {loc_input}: Lat {latitude:.4f}, Lon {longitude:.4f}")
-            else:
-                st.warning(f"📍 Could not find coordinates for '{loc_input}'.")
-
-        # Validate
         if not title or not ingredients or not steps:
-            st.error("🚨 Title, Ingredients, and Steps are required fields.")
+            st.error("🚨 Title, Ingredients, and Steps are required.")
         else:
-            # Save media files
-            image_path = video_path = audio_path = None
+            # Geolocation logic
+            latitude, longitude = None, None
+            def get_location_with_retry(place, retries=3, delay=2):
+                from geopy.geocoders import Nominatim
+                from geopy.exc import GeocoderTimedOut
+                import time
+                geolocator = Nominatim(user_agent="kitchen-secrets-app", timeout=10)
+                for attempt in range(retries):
+                    try:
+                        location = geolocator.geocode(f"{place}, India")
+                        if location:
+                            return location
+                    except GeocoderTimedOut:
+                        time.sleep(delay)
+                return None
+
+            if loc_input.strip():
+                location = get_location_with_retry(loc_input)
+                if location:
+                    latitude = location.latitude
+                    longitude = location.longitude
+                    st.success(f"🗺️ Coordinates found for {loc_input}: Lat {latitude:.4f}, Lon {longitude:.4f}")
+                else:
+                    st.warning(f"⚠️ Could not determine location coordinates for '{loc_input}'.")
+
+            # Media file saving
+            image_path = None
             if image_file:
                 image_filename = f"{uuid.uuid4()}_{image_file.name}"
                 image_path = os.path.join(MEDIA_DIR, image_filename)
@@ -511,6 +509,7 @@ if st.session_state.get('show_submit_form', False):
                     f.write(image_file.getbuffer())
                 image_path = image_filename
 
+            video_path = None
             if video_file:
                 video_filename = f"{uuid.uuid4()}_{video_file.name}"
                 video_path = os.path.join(MEDIA_DIR, video_filename)
@@ -518,6 +517,7 @@ if st.session_state.get('show_submit_form', False):
                     f.write(video_file.getbuffer())
                 video_path = video_filename
 
+            audio_path = None
             if audio_file:
                 audio_filename = f"{uuid.uuid4()}_{audio_file.name}"
                 audio_path = os.path.join(MEDIA_DIR, audio_filename)
@@ -525,6 +525,7 @@ if st.session_state.get('show_submit_form', False):
                     f.write(audio_file.getbuffer())
                 audio_path = audio_filename
 
+            # Language and Wikipedia info
             combined_text = f"{title} {ingredients} {steps}"
             detected_language = detect_language(combined_text)
             wiki_summary = get_wiki_summary(title)
@@ -554,8 +555,6 @@ if st.session_state.get('show_submit_form', False):
             st.balloons()
             st.session_state.show_submit_form = False
             st.rerun()
-
-    st.divider()
 
 
 
