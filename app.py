@@ -362,57 +362,59 @@ if not st.session_state.authenticated:
     st.divider()
 
     # Use a container to visually group login/signup forms
-    with st.container(border=False): # Changed to border=False as custom CSS handles border/shadow
-        col_login_spacer, col_login_form, col_login_spacer2 = st.columns([1, 2, 1])
-        with col_login_form:
-            auth_choice = st.radio(
-                "Choose an option to get started:",
-                ["Login", "Sign Up"],
-                key="auth_choice_main",
-                horizontal=True,
-                help="Select 'Login' if you have an account, or 'Sign Up' to create a new one."
-            )
-            st.markdown("<br>", unsafe_allow_html=True) # Add some space
+with st.container(border=False):  # Custom CSS handles border/shadow
+    col_login_spacer, col_login_form, col_login_spacer2 = st.columns([1, 2, 1])
+    with col_login_form:
+        auth_choice = st.radio(
+            "Choose an option to get started:",
+            ["Login", "Sign Up"],
+            key="auth_choice_main",
+            horizontal=True,
+            help="Select 'Login' if you have an account, or 'Sign Up' to create a new one."
+        )
+        st.markdown("<br>", unsafe_allow_html=True)  # Add space
 
-            if auth_choice == "Login":
-                st.markdown("<h3>🔑 Login to Your Account</h3>", unsafe_allow_html=True)
-                with st.form("Login_Form", clear_on_submit=False):
-                    username_login = st.text_input("Username", key="username_login")
-                    password_login = st.text_input("Password", type="password", key="password_login")
-                    login_submit = st.form_submit_button("Login to Kitchen Secrets")
+        if auth_choice == "Login":
+            st.markdown("<h3>🔑 Login to Your Account</h3>", unsafe_allow_html=True)
+            with st.form("Login_Form", clear_on_submit=False):
+                username_login = st.text_input("Username", key="username_login")
+                password_login = st.text_input("Password", type="password", key="password_login")
+                login_submit = st.form_submit_button("Login to Kitchen Secrets")
 
-                    if login_submit:
-                        if login_user(username_login, password_login):
-                            st.session_state.authenticated = True
-                            st.session_state.username = username_login
-                            users_data = load_users()
-                            st.session_state.user_data = users_data.get(username_login, {})
-                            st.success(f"🎉 Welcome back, {st.session_state.user_data.get('name', username_login)}! Redirecting...")
-                            st.rerun()
+                if login_submit:
+                    if login_user(username_login, password_login):
+                        st.session_state.authenticated = True
+                        st.session_state.username = username_login
+                        users_data = load_users()
+                        st.session_state.user_data = users_data.get(username_login, {})
+                        st.success(f"🎉 Welcome back, {st.session_state.user_data.get('name', username_login)}! Redirecting...")
+                        st.rerun()
+                    else:
+                        st.error("❌ Invalid username or password. Please check your credentials.")
+
+        elif auth_choice == "Sign Up":
+            st.markdown("<h3>✨ Create a New Account</h3>", unsafe_allow_html=True)
+            with st.form("Signup_Form", clear_on_submit=True):
+                username_signup = st.text_input("Choose a Username", help="This will be your unique identifier.")
+                password_signup = st.text_input("Set a Password", type="password", help="Make it strong!")
+                name_signup = st.text_input("Your Full Name", help="How you'd like to be addressed in the community.")
+                email_signup = st.text_input("Your Email", help="For important notifications (we value your privacy).")
+                location_signup = st.text_input("Your Location (e.g., city, state)", help="Helps us understand regional food trends and connect you with local dishes.")
+                signup_submit = st.form_submit_button("Join Kitchen Secrets")
+
+                if signup_submit:
+                    if username_signup and password_signup and name_signup and email_signup and location_signup:
+                        if signup_user(username_signup, password_signup, name_signup, email_signup, location_signup):
+                            st.success("✅ Account created successfully! Please **Login** using your new credentials to continue.")
+                            # Set a safe flag to switch to login after rerun
+                            st.session_state.switch_to_login = True
+                            st.experimental_rerun()
                         else:
-                            st.error("❌ Invalid username or password. Please check your credentials.")
-            elif auth_choice == "Sign Up":
-                st.markdown("<h3>✨ Create a New Account</h3>", unsafe_allow_html=True)
-                with st.form("Signup_Form", clear_on_submit=True):
-                    username_signup = st.text_input("Choose a Username", help="This will be your unique identifier.")
-                    password_signup = st.text_input("Set a Password", type="password", help="Make it strong!")
-                    name_signup = st.text_input("Your Full Name", help="How you'd like to be addressed in the community.")
-                    email_signup = st.text_input("Your Email", help="For important notifications (we value your privacy).")
-                    location_signup = st.text_input("Your Location (e.g., city, state)", help="Helps us understand regional food trends and connect you with local dishes.")
-                    signup_submit = st.form_submit_button("Join Kitchen Secrets")
+                            st.error("🚫 Username already exists. Please choose a different one.")
+                    else:
+                        st.warning("⚠️ Please fill in all signup fields to create your account.")
 
-                    if signup_submit:
-                        if username_signup and password_signup and name_signup and email_signup and location_signup:
-                            if signup_user(username_signup, password_signup, name_signup, email_signup, location_signup):
-                                st.success("✅ Account created successfully! Please **Login** using your new credentials to continue.")
-                                # Optionally switch to login tab after successful signup
-                                st.session_state.auth_choice_main = "Login"
-                                st.rerun()
-                            else:
-                                st.error("🚫 Username already exists. Please choose a different one.")
-                        else:
-                            st.warning("⚠️ Please fill in all signup fields to create your account.")
-    st.stop() # Stop execution if not authenticated
+st.stop()  # Stop execution if not authenticated
 
 # --- Authenticated Section ---
 # Ensure user_data is always available right at the start of the authenticated section
