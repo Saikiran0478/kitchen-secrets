@@ -285,7 +285,7 @@ def delete_submission(entry_id):
                 aud_path = os.path.join(MEDIA_DIR, entry_data['audio_path'])
                 if os.path.exists(aud_path):
                     os.remove(aud_path)
-        
+
         os.remove(filepath)
         return True
     return False
@@ -313,7 +313,7 @@ def get_wiki_summary(dish):
 def get_similar_dishes(title, all_entries):
     if not all_entries:
         return []
-    
+
     # Filter out entries that don't have a 'title' or are the current dish
     candidate_entries = [e for e in all_entries if 'title' in e and e['title'] != title]
     if not candidate_entries:
@@ -328,13 +328,13 @@ def get_similar_dishes(title, all_entries):
 
     embeddings = embedder.encode(candidate_titles, convert_to_tensor=True)
     query_embedding = embedder.encode(title, convert_to_tensor=True)
-    
+
     # Ensure scores are computed correctly
     scores = util.pytorch_cos_sim(query_embedding, embeddings)[0]
-    
+
     # Pair scores with candidate entries and sort
     results = sorted(zip(scores, candidate_entries), key=lambda x: -x[0])
-    
+
     # Return top 3 unique results (excluding the dish itself, already handled by filtering candidate_entries)
     unique_similar = []
     seen_titles = set()
@@ -373,6 +373,8 @@ if "show_submit_form" not in st.session_state:
 if "auth_choice_main" not in st.session_state:
     st.session_state.auth_choice_main = "Login"
 
+# 👇 Login/Signup block
+with st.container(border=False):  # Changed to border=False as custom CSS handles border/shadow
 # Use a container to visually group login/signup forms
 with st.container(border=False):  # Custom CSS handles border/shadow
     col_login_spacer, col_login_form, col_login_spacer2 = st.columns([1, 2, 1])
@@ -384,6 +386,7 @@ with st.container(border=False):  # Custom CSS handles border/shadow
             horizontal=True,
             help="Select 'Login' if you have an account, or 'Sign Up' to create a new one."
         )
+        st.markdown("<br>", unsafe_allow_html=True)  # Add some space
         st.markdown("<br>", unsafe_allow_html=True)  # Add space
 
         if auth_choice == "Login":
@@ -418,9 +421,12 @@ with st.container(border=False):  # Custom CSS handles border/shadow
                     if username_signup and password_signup and name_signup and email_signup and location_signup:
                         if signup_user(username_signup, password_signup, name_signup, email_signup, location_signup):
                             st.success("✅ Account created successfully! Please **Login** using your new credentials to continue.")
+                            # Optionally switch to login tab after successful signup
+                            st.session_state.auth_choice_main = "Login"
+                            st.rerun()
                             # Set a safe flag to switch to login after rerun
                             st.session_state.switch_to_login = True
-                            st.rerun()
+                            st.experimental_rerun()
                         else:
                             st.error("🚫 Username already exists. Please choose a different one.")
                     else:
@@ -454,14 +460,14 @@ with col_nav2:
 if st.session_state.get('show_submit_form', False):
     st.markdown("<h2>📝 Submit Your Recipe</h2>", unsafe_allow_html=True)
     st.info("💡 Fields marked with a * are required.")
-    
+
     with st.form("submit_form", clear_on_submit=True):
         st.markdown("<h3>Recipe Core Details 🍽️</h3>", unsafe_allow_html=True)
         col_r1, col_r2 = st.columns(2)
         with col_r1:
             title = st.text_input("Recipe Title *", placeholder="e.g., 'Hyderabadi Biryani', 'Misal Pav'", help="Give your delicious recipe a catchy, descriptive name.")
             category = st.selectbox("Category 📂", ["Festival", "Traditional", "Street Food", "Home Style", "Dessert", "Snack", "Beverage", "Other"], help="What kind of dish is this?")
-            
+
         with col_r2:
             state_selected = st.selectbox(
                 "State or Region of Origin 📍",
@@ -470,7 +476,7 @@ if st.session_state.get('show_submit_form', False):
                 help="Which Indian state/region is this dish typically from? This helps categorize and map the cuisine."
             )
             loc_input = st.text_input("Specific City/Town (Optional)", value=user_data.get("location", ""), placeholder="e.g., 'Hyderabad', 'Pune'", help="Enter a specific city or town if you want to pinpoint this recipe's origin on the map.")
-            
+
             latitude, longitude = None, None
             if loc_input:
                 try:
@@ -488,7 +494,7 @@ if st.session_state.get('show_submit_form', False):
         st.markdown("<h3>Ingredients & Preparation 🧑‍🍳</h3>", unsafe_allow_html=True)
         ingredients = st.text_area("Ingredients (comma-separated) *", height=100, placeholder="e.g., '2 cups basmati rice, 500g chicken, 1 onion, ginger-garlic paste'", help="List all ingredients clearly, separated by commas.")
         steps = st.text_area("Steps / Instructions *", height=250, placeholder="1. Wash rice and soak for 30 mins.\n2. Marinate chicken...\n3. Layer and cook...", help="Provide clear, step-by-step instructions for preparing the dish.")
-        
+
         st.markdown("<h3>Add Visuals & Audio 📸 (Optional)</h3>", unsafe_allow_html=True)
         st.write("Enhance your recipe with a photo, cooking video, or even a narrated guide!")
         col_media1, col_media2, col_media3 = st.columns(3)
@@ -498,7 +504,7 @@ if st.session_state.get('show_submit_form', False):
             video_file = st.file_uploader("Upload a Video 📹", type=["mp4", "mov", "webm", "mpeg", "mpg"], help="A short clip of the cooking process or the final dish. (Max 20MB recommended)")
         with col_media3:
             audio_file = st.file_uploader("Upload an Audio 🎤", type=["mp3", "wav", "ogg", "flac", "aac", "wma", "m4a", "aiff", "alac", "mpeg", "mp2"], help="Narrate the steps, share a traditional song, or capture cooking sounds. (Max 10MB recommended)")
-            
+
         st.divider() # Cleaner separator before submit button
         submit = st.form_submit_button("🚀 Publish My Recipe!")
 
@@ -529,7 +535,7 @@ if st.session_state.get('show_submit_form', False):
                     with open(audio_path, "wb") as f:
                         f.write(audio_file.getbuffer())
                     audio_path = audio_filename # Store relative path/filename
-                
+
                 combined_text = f"{title} {ingredients} {steps}"
                 detected_language = detect_language(combined_text)
                 wiki_summary = get_wiki_summary(title)
@@ -553,7 +559,7 @@ if st.session_state.get('show_submit_form', False):
                     "wiki_info": wiki_summary,
                     "timestamp": datetime.now().isoformat()
                 }
-                
+
                 recipe_id = save_submission(data)
                 st.success(f"🎉 Success! Your recipe '{title}' has been submitted! (ID: {recipe_id})")
                 st.balloons() # Celebrate the submission!
@@ -588,10 +594,10 @@ else:
 
     for recipe in filtered_recipes:
         with st.expander(f"🍽️ **{recipe.get('title', 'Untitled Recipe')}** | by {recipe.get('name', recipe.get('username', 'Unknown'))} from {recipe.get('state_origin', 'Unknown State')}"):
-            
+
             # Use columns for media and details side-by-side
             col_display_media, col_display_details = st.columns([1, 2])
-            
+
             with col_display_media:
                 st.markdown("<h6>Media 📸</h6>", unsafe_allow_html=True)
                 if recipe.get("image_path"):
@@ -628,25 +634,25 @@ else:
                             st.warning(f"Could not load audio: {e}")
                     else:
                         st.info("Audio file not found.")
-            
+
             with col_display_details:
                 st.markdown("<h6>Recipe Overview 📝</h6>", unsafe_allow_html=True)
                 st.markdown(f"**Category:** `{recipe.get('category', 'N/A')}`")
                 st.markdown(f"**Origin:** {recipe.get('location_name', 'N/A')} ({recipe.get('state_origin', 'N/A')})")
                 st.markdown(f"**Submitted On:** `{datetime.fromisoformat(recipe['timestamp']).strftime('%Y-%m-%d %H:%M')}`")
-                
+
                 st.markdown("---")
                 st.markdown("**Ingredients:**")
                 st.markdown(f"_{recipe.get('ingredients', 'N/A')}_")
-                
+
                 st.markdown("**Instructions:**")
                 st.markdown(f"_{recipe.get('steps', 'N/A')}_")
-                
+
                 st.markdown("---")
                 st.markdown("<h6>AI Insights 🧠</h6>", unsafe_allow_html=True)
                 st.markdown(f"**Language Detected:** `{recipe.get('language', 'N/A').upper()}`")
                 st.markdown(f"**Wikipedia Summary:** _{recipe.get('wiki_info', 'No specific Wikipedia information available for this dish.')}_")
-                
+
                 # Similar Dishes
                 similar_dishes = get_similar_dishes(recipe.get('title', ''), all_recipes)
                 if similar_dishes:
@@ -697,7 +703,7 @@ if not map_data.empty:
             [row['latitude'], row['longitude']],
             tooltip=f"**{row['name']}** from {row['state']}"
         ).add_to(m)
-    
+
     st_folium(m, width=700, height=500)
 else:
     st.info("📍 No recipes with location data available to display on the map yet. Submit a recipe with a city/town to see it here!")
