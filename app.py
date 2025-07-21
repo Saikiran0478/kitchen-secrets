@@ -448,21 +448,35 @@ if st.session_state.get('show_submit_form', False):
                 index=INDIAN_STATES.index(user_data.get("location", "Telangana")) if user_data.get("location") in INDIAN_STATES else 23,
                 help="Which Indian state/region is this dish typically from? This helps categorize and map the cuisine."
             )
-            loc_input = st.text_input("Specific City/Town (Optional)", value=user_data.get("location", ""), placeholder="e.g., 'Hyderabad', 'Pune'", help="Enter a specific city or town if you want to pinpoint this recipe's origin on the map.")
-            
-            latitude, longitude = None, None
-            if loc_input:
-                try:
-                    geolocator = Nominatim(user_agent="kitchen-secrets-app")
-                    location = geolocator.geocode(f"{loc_input}, India") # Add India to help with accuracy
-                    if location:
-                        latitude = location.latitude
-                        longitude = location.longitude
-                        st.success(f"🗺️ Coordinates found for {loc_input}: Lat {latitude:.4f}, Lon {longitude:.4f}")
-                    else:
-                        st.warning(f"📍 Could not find precise coordinates for '{loc_input}'. Try a more general location (e.g., 'Mumbai') or leave this field blank.")
-                except Exception as e:
-                    st.error(f"❌ Error getting coordinates: {e}. Please check your input or try again later.")
+            loc_input = st.text_input(
+    "Specific City/Town (Optional)",
+    value=user_data.get("location", ""),
+    placeholder="e.g., 'Hyderabad', 'Pune'",
+    help="Enter a specific city or town if you want to pinpoint this recipe's origin on the map."
+)
+
+from geopy.geocoders import Nominatim
+from geopy.exc import GeocoderTimedOut
+import time
+
+def get_location_with_retry(place, retries=3, delay=2):
+    geolocator = Nominatim(user_agent="kitchen-secrets-app", timeout=10)
+    for attempt in range(retries):
+        try:
+            return geolocator.geocode(f"{place}, India")
+        except GeocoderTimedOut:
+            time.sleep(delay)
+    return None
+
+latitude, longitude = None, None
+if loc_input:
+    location = get_location_with_retry(loc_input)
+    if location:
+        latitude = location.latitude
+        longitude = location.longitude
+        st.success(f"🗺️ Coordinates found for {loc_input}: Lat {latitude:.4f}, Lon {longitude:.4f}")
+    else:
+        st.warning(f"📍 Could not find precise coordinates for '{loc_input}'. Try a more general location (e.g., 'Mumbai') or leave this field blank.")
 
         st.markdown("<h3>Ingredients & Preparation 🧑‍🍳</h3>", unsafe_allow_html=True)
         ingredients = st.text_area("Ingredients (comma-separated) *", height=100, placeholder="e.g., '2 cups basmati rice, 500g chicken, 1 onion, ginger-garlic paste'", help="List all ingredients clearly, separated by commas.")
