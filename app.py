@@ -220,13 +220,13 @@ def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
 def load_users():
-    if os.path.exists(USERS_FILE):
-        with open(USERS_FILE, 'r') as f:
+    if os.path.exists(users.json):
+        with open(users.json, 'r') as f:
             return json.load(f)
     return {}
 
 def save_users(users):
-    with open(USERS_FILE, 'w') as f:
+    with open(users.json, 'w') as f:
         json.dump(users, f, indent=4) # Added indent for readability
 
 def signup_user(username, password, name, email, location):
