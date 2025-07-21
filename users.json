@@ -1,1 +1,10 @@
-s
+{
+  "admin": {
+    "password": "$2b$12$w2hkuOHvMGlh2Kbm3i.WHOGvZu0PIJ7p7EVZ05Bf0K5ENepuE4Ltq",
+    "name": "Admin",
+    "email": "admin@example.com",
+    "location": "HQ",
+    "points": 0,
+    "is_admin": true
+  }
+}
