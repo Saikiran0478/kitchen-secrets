@@ -362,7 +362,8 @@ if not st.session_state.authenticated:
     st.divider()
 
     # Use a container to visually group login/signup forms
-    with st.container(border=False):  # Custom CSS handles border/shadow
+        # Use a container to visually group login/signup forms
+with st.container(border=False):  # Custom CSS handles border/shadow
     col_login_spacer, col_login_form, col_login_spacer2 = st.columns([1, 2, 1])
     with col_login_form:
         auth_choice = st.radio(
