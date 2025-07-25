@@ -417,7 +417,6 @@ if not user_data and st.session_state.username: # If authenticated but user_data
 st.markdown("<h1>Kitchen Secrets: Culinary Journey</h1>", unsafe_allow_html=True)
 st.markdown(f"<p style='text-align: center; color: #555;'>✨ Welcome, **{user_data.get('name', st.session_state.username)}**! Share your culinary traditions with the world. ✨</p>", unsafe_allow_html=True)
 st.divider() # Replaced st.markdown("---") for a cleaner line
-
 # --- Main Navigation / Action Buttons ---
 col_nav1, col_nav2 = st.columns([1,1])
 with col_nav1:
