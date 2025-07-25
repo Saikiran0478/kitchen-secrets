@@ -15,6 +15,7 @@ import fasttext
 import wikipedia
 import pandas as pd
 import altair as alt
+import requests
 
 # --- Configuration and Initialization ---
 # Set page config - ensures wide layout for better content display
@@ -187,16 +188,31 @@ if not os.path.exists(DATA_DIR):
 if not os.path.exists(MEDIA_DIR):
     os.makedirs(MEDIA_DIR)
 
-# Initialize models (only if not already in cache/session state)
+def download_fasttext_model():
+    model_dir = "models"
+    model_path = os.path.join(model_dir, "lid.176.ftz")
+    url = "https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.ftz"
+
+    if not os.path.exists(model_dir):
+        os.makedirs(model_dir)
+
+    if not os.path.exists(model_path) or os.path.getsize(model_path) < 100_000:
+        with st.spinner("Downloading FastText language model..."):
+            response = requests.get(url, stream=True)
+            with open(model_path, "wb") as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:
+                        f.write(chunk)
+    return model_path
+
 @st.cache_resource
 def load_models():
     embedder = SentenceTransformer('paraphrase-MiniLM-L6-v2')
-    lang_model = fasttext.load_model("models/lid.176.ftz")
-
+    model_path = download_fasttext_model()
+    lang_model = fasttext.load_model(model_path)
     return embedder, lang_model
 
 embedder, lang_model = load_models()
-
 # List of Indian States for dropdown
 INDIAN_STATES = [
     "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
